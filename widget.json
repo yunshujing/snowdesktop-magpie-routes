@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 2,
+  "id": "d31944a8-b665-4509-a04c-b371a5d55f8f",
+  "slug": "magpie-routes",
+  "apiVersion": 2,
+  "dataVersion": 1,
+  "entry": "main.lua",
+  "minHostVersion": "1.0.11.0",
+  "author": "Yskye",
+  "license": "MIT",
+  "name": "Routes for Magpie",
+  "nameKey": "lua_widget.magpie_routes.name",
+  "version": "1.0.0",
+  "description": "Live routing for magpie: which agent called, which account answered, and what it spent.",
+  "descriptionKey": "lua_widget.magpie_routes.description",
+  "preview": "preview.png",
+  "previewGallery": [
+    "previews/zh-CN.png"
+  ],
+  "locales": {
+    "en-US": {
+      "lua_widget.magpie_routes.name": "Routes for Magpie",
+      "lua_widget.magpie_routes.description": "Live routing for magpie: which agent called, which account answered, and what it spent.",
+      "lua_widget.magpie_routes.preset_frosted": "Frosted",
+      "lua_widget.magpie_routes.preset_solid": "Solid",
+      "lua_widget.magpie_routes.preset_clear": "Clear",
+      "lua_widget.magpie_routes.settings_gateway": "Gateway address",
+      "lua_widget.magpie_routes.settings_interval": "Refresh interval",
+      "lua_widget.magpie_routes.settings_period": "Usage period",
+      "lua_widget.magpie_routes.settings_mask": "Mask account names",
+      "lua_widget.magpie_routes.period_today": "Today",
+      "lua_widget.magpie_routes.period_week": "Last 7 days",
+      "lua_widget.magpie_routes.period_month": "Last 30 days",
+      "lua_widget.magpie_routes.status_live": "Routing",
+      "lua_widget.magpie_routes.status_connecting": "Connecting",
+      "lua_widget.magpie_routes.status_offline": "Offline",
+      "lua_widget.magpie_routes.footer_waiting": "Waiting for magpie",
+      "lua_widget.magpie_routes.error_permission": "Network access is required to read magpie",
+      "lua_widget.magpie_routes.error_offline": "Cannot reach the magpie gateway",
+      "lua_widget.magpie_routes.hint_gateway": "Check that magpie is running at {0}",
+      "lua_widget.magpie_routes.empty_connecting": "Connecting to magpie",
+      "lua_widget.magpie_routes.more_agents": "+{0} more",
+      "lua_widget.magpie_routes.more_accounts": "+{0} more",
+      "lua_widget.magpie_routes.tooltip_agent": "{0} · {1} requests · {2} tokens",
+      "lua_widget.magpie_routes.tooltip_quota": "{0} · {1} left · {2}",
+      "lua_widget.magpie_routes.tooltip_usage": "Input {0} · Output {1} · Cache {2} · Spend {3}",
+      "lua_widget.magpie_routes.menu_refresh": "Refresh now",
+      "lua_widget.magpie_routes.menu_clear_filter": "Clear filter",
+      "lua_widget.magpie_routes.menu_settings": "Component settings",
+      "lua_widget.magpie_routes.preview_intro": "Choose a starting size. You can resize it anytime after adding.",
+      "lua_widget.magpie_routes.preview_standard": "Routing board",
+      "lua_widget.magpie_routes.preview_standard_hint": "Agents, the magpie hub and the accounts it picked, side by side.",
+      "lua_widget.magpie_routes.preview_wide": "Wide board",
+      "lua_widget.magpie_routes.preview_wide_hint": "More room for additional agents and accounts at once.",
+      "lua_widget.magpie_routes.hub_caption": "recent",
+      "lua_widget.magpie_routes.empty_no_routes": "No recent requests",
+      "lua_widget.magpie_routes.hint_no_routes": "magpie is connected and waiting for the next call",
+      "lua_widget.magpie_routes.account_speed": "{0} tok/s",
+      "lua_widget.magpie_routes.compact_calls": "{0} · {1} calls",
+      "lua_widget.magpie_routes.preview_compact": "Status bar",
+      "lua_widget.magpie_routes.preview_compact_hint": "A single-row strip: connection, recent count and usage.",
+      "lua_widget.magpie_routes.agent_meta": "{0} requests · {1} tokens",
+      "lua_widget.magpie_routes.stat_calls": "requests",
+      "lua_widget.magpie_routes.stat_tokens": "tokens",
+      "lua_widget.magpie_routes.stat_spend": "spend",
+      "lua_widget.magpie_routes.quota_reset": "renews in {0}d",
+      "lua_widget.magpie_routes.agent_count": "{0} requests"
+    },
+    "zh-CN": {
+      "lua_widget.magpie_routes.name": "Magpie 路由板",
+      "lua_widget.magpie_routes.description": "实时查看 magpie 的请求路由：哪个客户端发出、最终由哪个账号接单、花了多少令牌。",
+      "lua_widget.magpie_routes.preset_frosted": "磨砂",
+      "lua_widget.magpie_routes.preset_solid": "实色",
+      "lua_widget.magpie_routes.preset_clear": "透明",
+      "lua_widget.magpie_routes.settings_gateway": "网关地址",
+      "lua_widget.magpie_routes.settings_interval": "刷新间隔",
+      "lua_widget.magpie_routes.settings_period": "用量统计周期",
+      "lua_widget.magpie_routes.settings_mask": "隐藏账号名",
+      "lua_widget.magpie_routes.period_today": "今日",
+      "lua_widget.magpie_routes.period_week": "近 7 天",
+      "lua_widget.magpie_routes.period_month": "近 30 天",
+      "lua_widget.magpie_routes.status_live": "路由中",
+      "lua_widget.magpie_routes.status_connecting": "连接中",
+      "lua_widget.magpie_routes.status_offline": "未连接",
+      "lua_widget.magpie_routes.footer_waiting": "等待 magpie 数据",
+      "lua_widget.magpie_routes.error_permission": "需要网络权限才能读取 magpie",
+      "lua_widget.magpie_routes.error_offline": "无法连接 magpie 网关",
+      "lua_widget.magpie_routes.hint_gateway": "请确认 magpie 正在运行：{0}",
+      "lua_widget.magpie_routes.empty_connecting": "正在连接 magpie",
+      "lua_widget.magpie_routes.more_agents": "另有 {0} 个",
+      "lua_widget.magpie_routes.more_accounts": "另有 {0} 个",
+      "lua_widget.magpie_routes.tooltip_agent": "{0} · {1} 次请求 · {2} 令牌",
+      "lua_widget.magpie_routes.tooltip_quota": "{0} · 剩余 {1} · {2}",
+      "lua_widget.magpie_routes.tooltip_usage": "输入 {0} · 输出 {1} · 缓存 {2} · 花费 {3}",
+      "lua_widget.magpie_routes.menu_refresh": "立即刷新",
+      "lua_widget.magpie_routes.menu_clear_filter": "清除筛选",
+      "lua_widget.magpie_routes.menu_settings": "组件设置",
+      "lua_widget.magpie_routes.preview_intro": "选择初始尺寸，添加后仍可随时调整。",
+      "lua_widget.magpie_routes.preview_standard": "路由板",
+      "lua_widget.magpie_routes.preview_standard_hint": "左边客户端、中间 magpie、右边实际接单的账号。",
+      "lua_widget.magpie_routes.preview_wide": "宽幅路由板",
+      "lua_widget.magpie_routes.preview_wide_hint": "空间更充裕时，可以同时看到更多客户端与账号。",
+      "lua_widget.magpie_routes.hub_caption": "近期",
+      "lua_widget.magpie_routes.empty_no_routes": "暂无近期请求",
+      "lua_widget.magpie_routes.hint_no_routes": "magpie 已连接，正在等待下一次调用",
+      "lua_widget.magpie_routes.account_speed": "{0} tok/s",
+      "lua_widget.magpie_routes.compact_calls": "{0} · {1} 次调用",
+      "lua_widget.magpie_routes.preview_compact": "状态条",
+      "lua_widget.magpie_routes.preview_compact_hint": "单行高度时的状态条：连接状态、近期请求数与用量。",
+      "lua_widget.magpie_routes.agent_meta": "{0} 次 · {1} 令牌",
+      "lua_widget.magpie_routes.stat_calls": "次请求",
+      "lua_widget.magpie_routes.stat_tokens": "令牌",
+      "lua_widget.magpie_routes.stat_spend": "花费",
+      "lua_widget.magpie_routes.quota_reset": "{0} 天后续",
+      "lua_widget.magpie_routes.agent_count": "{0} 次"
+    }
+  },
+  "defaultSize": {
+    "columns": 4,
+    "rows": 2
+  },
+  "minSize": {
+    "columns": 3,
+    "rows": 1
+  },
+  "previewData": {
+    "introductionKey": "lua_widget.magpie_routes.preview_intro",
+    "introduction": "Choose a starting size. You can resize it anytime after adding.",
+    "storage": {
+      "previewAgents": "zcode|ZCode|12;dsh|DSH|7;tunnel|Tunnel|3",
+      "previewAccounts": "workbuddy@Amy|98|8|331.93 / 500;workbuddy@Ben|72|6|104.74 / 500;officeace@Kit|41|3|36.2 / 60",
+      "previewUsage": "8800000|640000|976|1.83|88757376",
+      "previewModel": "deepseek-v4.1-flash"
+    },
+    "variants": [
+      {
+        "id": "standard",
+        "title": "Routing board",
+        "titleKey": "lua_widget.magpie_routes.preview_standard",
+        "description": "Agents, the magpie hub and the accounts it picked, side by side.",
+        "descriptionKey": "lua_widget.magpie_routes.preview_standard_hint",
+        "size": {
+          "columns": 4,
+          "rows": 2
+        }
+      },
+      {
+        "id": "wide",
+        "title": "Wide board",
+        "titleKey": "lua_widget.magpie_routes.preview_wide",
+        "description": "More room for additional agents and accounts at once.",
+        "descriptionKey": "lua_widget.magpie_routes.preview_wide_hint",
+        "size": {
+          "columns": 6,
+          "rows": 3
+        }
+      },
+      {
+        "id": "compact",
+        "title": "Status bar",
+        "titleKey": "lua_widget.magpie_routes.preview_compact",
+        "description": "A single-row strip: connection, recent count and usage.",
+        "descriptionKey": "lua_widget.magpie_routes.preview_compact_hint",
+        "size": {
+          "columns": 4,
+          "rows": 1
+        }
+      }
+    ]
+  },
+  "requiredFeatures": [
+    "animation.frame",
+    "draw.advanced",
+    "draw.immediate",
+    "interaction.contextMenu",
+    "interaction.pointerActions",
+    "interaction.region",
+    "lifecycle.event",
+    "lifecycle.model",
+    "l10n.basic",
+    "layout.relativeUnits",
+    "schedule.basic",
+    "schedule.visibility",
+    "settings.duration",
+    "settings.select.localizedOptions",
+    "task.network.request",
+    "task.network.standardHttp",
+    "task.start",
+    "time.basic",
+    "widget.context",
+    "ui.semanticMetrics.rowUnit"
+  ],
+  "optionalFeatures": [
+    "interaction.tooltip",
+    "task.network.headers",
+    "task.network.largeResponse"
+  ],
+  "permissions": [
+    "network.internet"
+  ],
+  "optionalPermissions": []
+}
