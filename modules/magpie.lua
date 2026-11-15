@@ -14,6 +14,17 @@ local find = string.find
 
 local magpie = {}
 
+-- The sandbox enforces a per-callback execution quota, and a very large usage
+-- or request response can hit it mid-decode, which arrives as a Lua error.
+-- Uncaught, that aborts the whole event handler and the board hangs on its
+-- last frame; caught, it becomes an ordinary parse failure that the next poll
+-- retries. Same guard as the TickTick widget.
+local function decode(body, skip)
+    local ok, payload, err = pcall(json.decode, body, skip and { skip = skip } or nil)
+    if not ok then return nil, "quotaExceeded" end
+    return payload, err
+end
+
 -- The usage endpoint repeats its totals as a per-bucket `by` breakdown, and
 -- `series` carries one of those per hour. The board only needs the flat totals
 -- and the per-bucket call counts, so `by` is dropped wherever it appears.
@@ -120,7 +131,7 @@ end
 -- keeps rows magpie's usage view folds away), so mixing the two made the
 -- widget's figures drift from the app's.
 function magpie.parseUsage(body)
-    local payload, err = json.decode(body, { skip = USAGE_SKIP })
+    local payload, err = decode(body, USAGE_SKIP)
     if not payload then return nil, err end
     if type(payload) ~= "table" then return nil, "notAnObject" end
 
@@ -147,7 +158,7 @@ end
 
 -- parseRequests(body) -> { period, calls, cost, series, rows }, nil
 function magpie.parseRequests(body)
-    local payload, err = json.decode(body, { skip = USAGE_SKIP })
+    local payload, err = decode(body, USAGE_SKIP)
     if not payload then return nil, err end
     if type(payload) ~= "table" then return nil, "notAnObject" end
 
@@ -308,7 +319,7 @@ end
 -- shows the overall budget: the widest window that carries a unit, because
 -- model token windows have no unit and are orders of magnitude larger.
 function magpie.parseQuotas(body)
-    local payload, err = json.decode(body)
+    local payload, err = decode(body)
     if not payload or type(payload) ~= "table" then return nil, err or "notAnObject" end
     if type(payload.data) ~= "table" then return nil, "notAnObject" end
 

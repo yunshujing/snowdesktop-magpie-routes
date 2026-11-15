@@ -65,6 +65,13 @@ local periodKeys = {
     ["7d"] = "lua_widget.magpie_routes.period_week",
     ["30d"] = "lua_widget.magpie_routes.period_month",
 }
+-- Shorter wording for the header switch: it shares the row with the status
+-- text and the gateway, so it cannot use the settings labels verbatim.
+local periodShortKeys = {
+    today = "lua_widget.magpie_routes.period_short_today",
+    ["7d"] = "lua_widget.magpie_routes.period_short_week",
+    ["30d"] = "lua_widget.magpie_routes.period_short_month",
+}
 
 local settings = {
     presets = {
@@ -751,6 +758,60 @@ local function drawPeriodPill(f, x, y, w, h, radius, label, tooltip)
     }, tooltip)
 end
 
+-- Header switch: three segments (today / week / 30 days), the same control the
+-- TickTick board uses. Geometry is computed once so the top bar can centre it
+-- before drawing; the tokens that used to sit in this pill already live in the
+-- footer, so the switch carries no duplicated figure.
+local function periodSegments(f, height)
+    local font = math.max(7, math.min(f.rowUnit * 0.34, height * 0.46))
+    local labels, widths, total = {}, {}, 0
+    for index = 1, #periods do
+        local label = l10n.tr(periodShortKeys[periods[index]])
+        local width = textWidth(label, font, false) + height * 0.66
+        labels[index], widths[index] = label, width
+        total = total + width
+    end
+    return labels, widths, total + height * 0.12, font
+end
+
+local function drawPeriodSwitch(f, x, y, height)
+    local c = f.c
+    local labels, widths, total, font = periodSegments(f, height)
+    local radius = height / 2
+    draw.rect(x, y, total, height, c.glass, radius, c.glassAlpha * 2.2)
+    draw.strokeRect(x, y, total, height, c.line, radius, f.hair,
+        c.lineAlpha * 0.9)
+
+    local cursor = x + height * 0.06
+    for index = 1, #periods do
+        local id = periods[index]
+        local active = f.cfg.period == id
+        if active then
+            draw.rect(cursor, y, widths[index], height, c.glass, radius,
+                c.glassAlpha * 3.6)
+            draw.strokeRect(cursor, y, widths[index], height, c.line, radius,
+                f.hair, c.lineAlpha * 1.2)
+        end
+        local boxX, boxWidth = centeredBox(labels[index], cursor, widths[index],
+            font, false, widths[index] - 4)
+        textMid(labels[index], boxX, y + height / 2, font,
+            active and c.ink or c.muted, boxWidth, false)
+        regionSpec({
+            key = "period:" .. id,
+            shape = { type = "roundedRect", x = cursor, y = y,
+                width = widths[index], height = height, radius = radius },
+            cursor = "hand",
+            events = {
+                click = { id = "period.set", value = id },
+                contextMenu = { id = "route.menu", scope = "component" },
+            },
+            accessibility = { role = "button", label = labels[index] },
+        })
+        cursor = cursor + widths[index]
+    end
+    return total
+end
+
 -- Compact bar: one row of height shows connection, recent count and usage.
 local function drawCompactBar(f)
     local c, model = f.c, f.model
@@ -816,35 +877,18 @@ local function drawTopBar(f)
         draw.circle(dotX, centerY, dotRadius * 2.6, f.statusColor, 0.14)
     end
 
-    local pillFont = math.min(f.rowUnit * 0.40, f.headerHeight * 0.44)
     local windowFont = math.min(f.rowUnit * 0.32, f.headerHeight * 0.34)
-    local pillHeight = math.min(f.headerHeight * 0.66, f.rowUnit * 1.05)
-    local pillPadding = pillHeight * 0.46
-    local tokensWidth = textWidth(f.tokensText, pillFont, true)
-    local pillWidth = tokensWidth + textWidth(f.periodLabel, windowFont, false)
-        + pillPadding * 2.4
-    local pillX = f.left + (f.usableWidth - pillWidth) / 2
-    local pillY = centerY - pillHeight / 2
-
-    local pillTooltip
-    if f.usage then
-        pillTooltip = l10n.tr("lua_widget.magpie_routes.tooltip_usage",
-            magpie.compact(f.usage.input), magpie.compact(f.usage.output),
-            magpie.compact(f.usage.cacheRead),
-            string.format("%.2f", f.usage.cost or 0))
-    end
-    drawPeriodPill(f, pillX, pillY, pillWidth, pillHeight, pillHeight / 2,
-        f.tokensText, pillTooltip)
-    textMid(f.tokensText, pillX + pillPadding, centerY, pillFont, c.ink, 0, true)
-    textMid(f.periodLabel, pillX + pillPadding + tokensWidth + pillPadding * 0.55,
-        centerY, windowFont, c.muted, 0, false)
+    local switchHeight = math.min(f.headerHeight * 0.70, f.rowUnit * 1.10)
+    local _, _, switchWidth = periodSegments(f, switchHeight)
+    local switchX = f.left + (f.usableWidth - switchWidth) / 2
+    drawPeriodSwitch(f, switchX, centerY - switchHeight / 2, switchHeight)
 
     local statusX = dotX + dotRadius * 2.6
     textMid(f.statusText, statusX, centerY, f.headerFont, c.ink2,
-        math.max(1, pillX - statusX - f.short * 0.02), false)
+        math.max(1, switchX - statusX - f.short * 0.02), false)
 
     local gatewayWidth = textWidth(f.gateway, windowFont, false)
-    if f.right - (pillX + pillWidth) > gatewayWidth + f.short * 0.03 then
+    if f.right - (switchX + switchWidth) > gatewayWidth + f.short * 0.03 then
         textRight(f.gateway, f.right, centerY, windowFont, c.faint, false)
     end
 end
@@ -1411,7 +1455,12 @@ local function event(_context, model, value)
     elseif value.id == "period.next" then
         cyclePeriod(model)
     elseif value.id == "period.set" then
-        setPeriod(model, tostring(value.value or "today"))
+        local target = tostring(value.value or "today")
+        local valid = false
+        for index = 1, #periods do
+            if periods[index] == target then valid = true end
+        end
+        setPeriod(model, valid and target or "today")
     elseif value.id == "filter.clear" then
         model.filter = nil
     elseif value.id == "agent.select" or value.id == "account.select" then
