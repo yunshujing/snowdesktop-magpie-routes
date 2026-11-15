@@ -108,11 +108,12 @@ return {
         same(failed.status, 0, "status")
     end,
 
-    ["parseRequests keeps the per-bucket series and drops its by breakdown"] = function()
+    ["parseRequests drops the hourly series and the by breakdown"] = function()
+        -- The rows endpoint repeats a large hourly series the board never
+        -- draws; on a 30d window that alone pushes the parse past the VM quota.
         local payload = magpie.parseRequests(REQUESTS)
-        same(#payload.series, 2, "series length")
-        same(payload.series[1], 307, "first bucket")
-        same(payload.series[2], 5, "second bucket")
+        same(payload.series, nil, "series dropped")
+        same(#payload.rows, 3, "rows kept")
         near(payload.cost, 1.82788415, 1e-9, "cost")
         same(payload.cacheRead, 88757376, "cache reads")
     end,

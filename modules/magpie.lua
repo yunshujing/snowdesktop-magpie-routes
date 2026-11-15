@@ -40,7 +40,55 @@ local USAGE_SKIP = {
     agents = true,
     accounts = true,
     big_write = true,
+    -- Aggregates the board never reads. On a 30d window `sessions` alone is
+    -- ~60 KB and `models` ~24 KB; parsing them pushed the response past the
+    -- VM's execution quota, so a period switch silently failed and retried.
+    sessions = true,
+    sessionCount = true,
+    models = true,
+    providerKeys = true,
+    path = true,
+    since = true,
+    retried = true,
+    canceled = true,
+    cache_write = true,
+    cache_unknown = true,
+    cache_unknown_calls = true,
+    reasoning = true,
+    unpriced = true,
+    credits = true,
+    credited = true,
+    timed = true,
+    decode_ms = true,
+    decode_out = true,
+    decode_n = true,
+    up_bytes = true,
+    down_bytes = true,
+    up_calls = true,
+    up_measured = true,
+    up_system = true,
+    up_tools = true,
+    up_images = true,
+    bucket = true,
+    floor_out = true,
+    floor_ms = true,
+    floor_n = true,
+    speed_min = true,
 }
+
+-- /usage/requests repeats every aggregate and carries an hourly series the
+-- board never draws (the sparkline comes from /usage). On 30d that series is
+-- ~59 KB, so it is skipped as well.
+local ROWS_SKIP = {}
+for key in pairs(USAGE_SKIP) do ROWS_SKIP[key] = true end
+ROWS_SKIP.series = true
+for _, key in ipairs({
+    "host", "req", "rid", "response_id", "ep", "stop", "session",
+    "native_session", "up_parts", "priced", "icon", "providerName", "access",
+    "first_reasoning_ms", "masking_ms", "flow_ms",
+}) do
+    ROWS_SKIP[key] = true
+end
 
 -- Howard Hinnant's civil-from-days, inverted: epoch day number for a date.
 function magpie.daysFromCivil(year, month, day)
@@ -156,9 +204,9 @@ function magpie.parseUsage(body)
     }
 end
 
--- parseRequests(body) -> { period, calls, cost, series, rows }, nil
+-- parseRequests(body) -> { period, calls, cost, rows }, nil
 function magpie.parseRequests(body)
-    local payload, err = decode(body, USAGE_SKIP)
+    local payload, err = decode(body, ROWS_SKIP)
     if not payload then return nil, err end
     if type(payload) ~= "table" then return nil, "notAnObject" end
 
@@ -173,16 +221,6 @@ function magpie.parseRequests(body)
         end
     end
 
-    local series = {}
-    if type(payload.series) == "table" then
-        for index = 1, #payload.series do
-            local bucket = payload.series[index]
-            if type(bucket) == "table" then
-                series[#series + 1] = tonumber(bucket.calls) or 0
-            end
-        end
-    end
-
     return {
         period = type(payload.period) == "string" and payload.period or "today",
         total = tonumber(payload.total) or count,
@@ -192,7 +230,6 @@ function magpie.parseRequests(body)
         output = tonumber(payload.output) or 0,
         cacheRead = tonumber(payload.cache_read) or 0,
         cost = tonumber(payload.cost),
-        series = series,
         rows = rows,
     }
 end
