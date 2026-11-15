@@ -65,13 +65,6 @@ local periodKeys = {
     ["7d"] = "lua_widget.magpie_routes.period_week",
     ["30d"] = "lua_widget.magpie_routes.period_month",
 }
--- Shorter wording for the header switch: it shares the row with the status
--- text and the gateway, so it cannot use the settings labels verbatim.
-local periodShortKeys = {
-    today = "lua_widget.magpie_routes.period_short_today",
-    ["7d"] = "lua_widget.magpie_routes.period_short_week",
-    ["30d"] = "lua_widget.magpie_routes.period_short_month",
-}
 
 local settings = {
     presets = {
@@ -763,15 +756,15 @@ end
 -- before drawing; the tokens that used to sit in this pill already live in the
 -- footer, so the switch carries no duplicated figure.
 local function periodSegments(f, height)
-    local font = math.max(7, math.min(f.rowUnit * 0.34, height * 0.46))
+    local font = math.max(7, math.min(f.rowUnit * 0.30, height * 0.47))
     local labels, widths, total = {}, {}, 0
     for index = 1, #periods do
-        local label = l10n.tr(periodShortKeys[periods[index]])
-        local width = textWidth(label, font, false) + height * 0.66
+        local label = l10n.tr(periodKeys[periods[index]])
+        local width = textWidth(label, font, false) + height * 0.58
         labels[index], widths[index] = label, width
         total = total + width
     end
-    return labels, widths, total + height * 0.12, font
+    return labels, widths, total + height * 0.10, font
 end
 
 local function drawPeriodSwitch(f, x, y, height)
@@ -782,7 +775,7 @@ local function drawPeriodSwitch(f, x, y, height)
     draw.strokeRect(x, y, total, height, c.line, radius, f.hair,
         c.lineAlpha * 0.9)
 
-    local cursor = x + height * 0.06
+    local cursor = x + height * 0.05
     for index = 1, #periods do
         local id = periods[index]
         local active = f.cfg.period == id
@@ -878,7 +871,7 @@ local function drawTopBar(f)
     end
 
     local windowFont = math.min(f.rowUnit * 0.32, f.headerHeight * 0.34)
-    local switchHeight = math.min(f.headerHeight * 0.70, f.rowUnit * 1.10)
+    local switchHeight = math.min(f.headerHeight * 0.62, f.rowUnit * 0.78)
     local _, _, switchWidth = periodSegments(f, switchHeight)
     local switchX = f.left + (f.usableWidth - switchWidth) / 2
     drawPeriodSwitch(f, switchX, centerY - switchHeight / 2, switchHeight)
@@ -1362,7 +1355,9 @@ end
 local function setPeriod(model, period)
     storage.set("period", period)
     model.usagePeriod = nil
-    if not model.preview then poll(model, true) end
+    -- Only the period-scoped endpoints changed; quotas are period-independent
+    -- and already refreshed on their own minute timer.
+    if not model.preview then poll(model, false) end
 end
 
 local function cyclePeriod(model)
@@ -1417,6 +1412,7 @@ local function event(_context, model, value)
 
         pump(model)
         ensureFrames(model)
+        widget.invalidate()
         return
     elseif value.kind == "frame" and value.id == "live" then
         model.framePending = false
@@ -1442,6 +1438,8 @@ local function event(_context, model, value)
                 schedule.every("poll", config().intervalMs, { whenHidden = "pause" })
             elseif keys[index] == "period" then
                 model.usagePeriod = nil
+                poll(model, false)
+                widget.invalidate()
             end
         end
         return
@@ -1474,6 +1472,11 @@ local function event(_context, model, value)
     elseif value.id == "settings.open" then
         widget.openSettings()
     end
+    -- Every action above changed something visible (period, filter, refresh).
+    -- Without this the new segment only lit up when the next frame or network
+    -- reply happened to repaint, which read as a laggy switch.
+    widget.invalidate()
+    ensureFrames(model)
 end
 
 local function menu(_context, model, request)
