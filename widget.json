@@ -10,7 +10,7 @@
   "license": "MIT",
   "name": "Routes for Magpie",
   "nameKey": "lua_widget.magpie_routes.name",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Live routing for magpie: which agent called, which account answered, and what it spent.",
   "descriptionKey": "lua_widget.magpie_routes.description",
   "preview": "preview.png",

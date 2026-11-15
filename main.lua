@@ -1452,7 +1452,7 @@ local function event(_context, model, value)
         poll(model, true)
     elseif value.id == "period.next" then
         cyclePeriod(model)
-    elseif value.id == "period.set" then
+    elseif value.id == "period.set" or value.id:sub(1, 11) == "period.set:" then
         local target = tostring(value.value or "today")
         local valid = false
         for index = 1, #periods do
@@ -1503,7 +1503,9 @@ local function menu(_context, model, request)
     local cfg = config()
     for index = 1, #periods do
         items[#items + 1] = {
-            id = "period.set",
+            -- Leaf ids must be unique inside one menu; the period rides in
+            -- value, the id only routes.
+            id = "period.set:" .. periods[index],
             value = periods[index],
             label = l10n.tr(periodKeys[periods[index]]),
             icon = glyph.period,
