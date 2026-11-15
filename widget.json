@@ -10,7 +10,7 @@
   "license": "MIT",
   "name": "Routes for Magpie",
   "nameKey": "lua_widget.magpie_routes.name",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Live routing for magpie: which agent called, which account answered, and what it spent.",
   "descriptionKey": "lua_widget.magpie_routes.description",
   "preview": "preview.png",
@@ -20,7 +20,7 @@
   "locales": {
     "en-US": {
       "lua_widget.magpie_routes.name": "Routes for Magpie",
-      "lua_widget.magpie_routes.description": "Live routing for magpie: which agent called, which account answered, and what it spent.",
+      "lua_widget.magpie_routes.description": "Live routing for magpie: which agent called, which account answered, and what it spent.\n\nSource & releases: https://github.com/yunshujing/snowdesktop-magpie-routes",
       "lua_widget.magpie_routes.preset_frosted": "Frosted",
       "lua_widget.magpie_routes.preset_solid": "Solid",
       "lua_widget.magpie_routes.preset_clear": "Clear",
@@ -71,7 +71,7 @@
     },
     "zh-CN": {
       "lua_widget.magpie_routes.name": "Magpie 路由板",
-      "lua_widget.magpie_routes.description": "实时查看 magpie 的请求路由：哪个客户端发出、最终由哪个账号接单、花了多少令牌。",
+      "lua_widget.magpie_routes.description": "实时查看 magpie 的请求路由：哪个客户端发出、最终由哪个账号接单、花了多少令牌。\n\n项目主页：https://github.com/yunshujing/snowdesktop-magpie-routes",
       "lua_widget.magpie_routes.preset_frosted": "磨砂",
       "lua_widget.magpie_routes.preset_solid": "实色",
       "lua_widget.magpie_routes.preset_clear": "透明",
